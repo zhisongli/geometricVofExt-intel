@@ -9,10 +9,9 @@ runApplication decomposePar -cellDist -fileHandler collated
 
 runParallel  $(getApplication) -fileHandler collated
 
-writeVtkSeries plicInterface
-writeVtkSeries isoInterface
-writeVtkSeries hole
-writeVtkSeries zPlaneCut
+writeVtkSeries isoInterface isoSurf
+writeVtkSeries hole face1
+writeVtkSeries zPlaneCut face1
 
 touch ${PWD##*/}.foam
 

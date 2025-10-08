@@ -9,10 +9,9 @@ runApplication decomposePar -fileHandler collated
 
 runParallel $(getApplication) -fileHandler collated
 
-writeVtkSeries plicInterface
-writeVtkSeries isoInterface
-writeVtkSeries symmYMin
-writeVtkSeries symmZMin
-writeVtkSeries body
+writeVtkSeries isoInterface isoSurf
+writeVtkSeries symmYMin symmYMin
+writeVtkSeries symmZMin symmZMin
+writeVtkSeries body body
 
 #------------------------------------------------------------------------------

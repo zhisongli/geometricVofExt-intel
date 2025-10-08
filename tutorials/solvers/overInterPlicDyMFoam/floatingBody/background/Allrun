@@ -7,10 +7,10 @@ runApplication decomposePar -fileHandler collated
 
 runParallel  $(getApplication) -fileHandler collated
 
-writeVtkSeries plicInterface
-writeVtkSeries isoInterface
-writeVtkSeries floatingObject
-writeVtkSeries stationaryWalls
+writeVtkSeries plicInterface plicSurf
+writeVtkSeries isoInterface isoSurf
+writeVtkSeries floatingObject floatingObject
+writeVtkSeries stationaryWalls stationaryWalls
 
 touch ${PWD##*/}.foam
 

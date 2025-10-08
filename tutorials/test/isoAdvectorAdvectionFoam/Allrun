@@ -17,8 +17,8 @@ runApplication isoAdvectorAdvectionFoam
 
 runApplication calcVofAdvectionErrors
 
-writeVtkSeries plicInterface
-writeVtkSeries isoInterface
+writeVtkSeries plicInterface plicSurf
+writeVtkSeries isoInterface plicSurf
 
 touch ${PWD##*/}.foam
 

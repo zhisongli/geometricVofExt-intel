@@ -16,9 +16,9 @@ runApplication decomposePar -fileHandler collated
 
 runParallel $(getApplication) -fileHandler collated
 
-writeVtkSeries plicInterface
-writeVtkSeries isoInterface
-writeVtkSeries sideWalls
+writeVtkSeries plicInterface plicSurf
+writeVtkSeries isoInterface isoSurf
+writeVtkSeries sideWalls sideWalls
 
 touch ${PWD##*/}.foam
 

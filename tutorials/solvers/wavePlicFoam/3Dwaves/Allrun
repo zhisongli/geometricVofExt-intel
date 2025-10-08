@@ -16,9 +16,9 @@ runApplication setWaveField
 
 runApplication $(getApplication)
 
-writeVtkSeries plicInterface
-writeVtkSeries isoInterface
-writeVtkSeries walls
-writeVtkSeries sides
+writeVtkSeries plicInterface plicSurf
+writeVtkSeries isoInterface isoSurf
+writeVtkSeries walls walls
+writeVtkSeries sides sides
 
 touch ${PWD##*/}.foam
