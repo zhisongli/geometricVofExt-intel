@@ -13,6 +13,9 @@ wmake -check-dir "$WM_PROJECT_USER_DIR/modules/geometricVofExt/src" 2>/dev/null 
 
 echo " >> Compile geometricVofExt libraries"
 
+echo -n "    >> "
+wmake libso dynamicRefine2DFvMesh
+
 
 ln -sf $WM_PROJECT_DIR/src/transportModels/geometricVoF/reconstructedDistanceFunction/reconstructedDistanceFunction.H $WM_PROJECT_USER_DIR/modules/geometricVofExt/src/SimPLIC/reconstruction/reconstructedDistanceFunction.H
 
@@ -21,6 +24,7 @@ ln -sf $WM_PROJECT_DIR/src/transportModels/geometricVoF/reconstructedDistanceFun
 echo -n "    >> "
 wmake libso SimPLIC
 
+
 if have_cgal; then
     echo -n "    >> "
     wmake libso CGALVof
@@ -28,8 +32,6 @@ else
     echo "    >> WARNING: CGAL is not found, cannot build CGALVof, skip"
 fi
 
-echo -n "    >> "
-wmake libso phaseChange/boiling/TwoPhaseFlow
 
 echo " >> Done"
 echo

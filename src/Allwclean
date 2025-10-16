@@ -2,6 +2,8 @@
 cd "${0%/*}" || exit    # Run from this directory
 #------------------------------------------------------------------------------
 
+wclean libso dynamicRefine2DFvMesh
+
 unlink $WM_PROJECT_USER_DIR/modules/geometricVofExt/src/SimPLIC/reconstruction/reconstructedDistanceFunction.H
 
 unlink $WM_PROJECT_USER_DIR/modules/geometricVofExt/src/SimPLIC/reconstruction/reconstructedDistanceFunction.C
@@ -9,7 +11,5 @@ unlink $WM_PROJECT_USER_DIR/modules/geometricVofExt/src/SimPLIC/reconstruction/r
 wclean libso SimPLIC
 
 wclean libso CGALVof
-
-wclean libso phaseChange/boiling/TwoPhaseFlow
 
 #------------------------------------------------------------------------------
