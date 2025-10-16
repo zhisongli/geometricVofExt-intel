@@ -39,6 +39,7 @@ Description
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 #include "dynamicRefineFvMesh.H"
+#include "dynamicRefine2DFvMesh.H"
 #include "dynamicOversetFvMesh.H"
 #include "reconstruction.H"
 #include "isoSurfaceTopo.H"
@@ -97,10 +98,17 @@ int main(int argc, char *argv[])
 
     #include "setAlphaField.H"
 
-    // Additional iterations for dynamicRefineFvMesh
-    if (isA<dynamicRefineFvMesh>(mesh) and runTime.timeIndex() == 0)
+    // Additional iterations for dynamicRefineFvMesh or dynamicRefine2DFvMesh
+    if ((isA<dynamicRefineFvMesh>(mesh) or isA<dynamicRefine2DFvMesh>(mesh)) and runTime.timeIndex() == 0)
     {
-        Info << "> > > Iterations for dynamicRefineFvMesh < < <" << nl << endl;
+        if (isA<dynamicRefineFvMesh>(mesh))
+        {
+            Info << "> > > Iterations for dynamicRefineFvMesh < < <" << nl << endl;
+        }
+        else
+        {
+            Info << "> > > Iterations for dynamicRefine2DFvMesh < < <" << nl << endl;
+        }
 
         dictionary refineDict
         (
