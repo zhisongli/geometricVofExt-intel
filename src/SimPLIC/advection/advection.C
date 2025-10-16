@@ -290,6 +290,8 @@ Foam::scalar Foam::geometricVofExt::SimPLIC::advection::netFlux
 
 void Foam::geometricVofExt::SimPLIC::advection::applyBruteForceBounding()
 {
+    bool alpha1Changed = false;
+
     if (snapAlphaTol_ > 0.0)
     {
         alpha1_ = alpha1_
@@ -297,12 +299,17 @@ void Foam::geometricVofExt::SimPLIC::advection::applyBruteForceBounding()
                 * neg0(alpha1_ - (1.0 - snapAlphaTol_))
                 + pos0(alpha1_ - (1.0 - snapAlphaTol_));
 
-        alpha1_.correctBoundaryConditions();
+        alpha1Changed = true;
     }
 
     if (clip_)
     {
         alpha1_ = min(scalar(1), max(scalar(0), alpha1_));
+        alpha1Changed = true;
+    }
+
+    if (alpha1Changed)
+    {
         alpha1_.correctBoundaryConditions();
     }
 }

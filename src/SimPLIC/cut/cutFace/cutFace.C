@@ -272,17 +272,18 @@ Foam::scalar Foam::geometricVofExt::SimPLIC::cutFace::timeIntegratedFaceFlux
 {
     const scalar TSMALL(10.0 * SMALL);
 
-    if (mag(phi) <= TSMALL)
-    {
-        return 0.0;
-    }
+    // if (mag(phi) <= TSMALL)
+    // {
+    //     return 0.0;
+    // }
 
     const face& f(mesh_.faces()[faceI]);
     const pointField& points(mesh_.points());
     const pointField fPts(f.points(points));
     const label nPoints(f.size());
     
-    if (mag(Un0 * dt) > TSMALL)     // Interface is not stationary
+    //if (mag(Un0 * dt) > TSMALL)     // Interface is not stationary
+    if (mag(Un0) > 1e-12)
     {
         // Estimate time of arrival to the face points from their ormal
         // distance to the initial interface and the interface normal velocity
