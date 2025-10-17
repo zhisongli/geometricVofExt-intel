@@ -538,13 +538,13 @@ Foam::dynamicRefine2DFvMesh::refine
 Foam::autoPtr<Foam::mapPolyMesh>
 Foam::dynamicRefine2DFvMesh::unrefine
 (
-    const labelList& splitPoints
+    const labelList& splitEdges
 )
 {
     polyTopoChange meshMod(*this);
 
     // Play refinement commands into mesh changer.
-    meshCutter_.setUnrefinement(splitPoints, meshMod);
+    meshCutter_.setUnrefinement(splitEdges, meshMod);
 
 
     // Save information on faces that will be combined
@@ -554,22 +554,24 @@ Foam::dynamicRefine2DFvMesh::unrefine
     // for each face resulting of split of face into four store the
     // midpoint
     //Map<label> faceToSplitPoint(3*splitPoints.size());
-    Map<label> faceToSplitPoint(2*splitPoints.size());
+    Map<label> faceToSplitPoint(2*splitEdges.size());
 
     {
-        for (const label pointi : splitPoints)
+        forAll(splitEdges, i)
         {
-            const labelList& pEdges = pointEdges()[pointi];
+            label edgei = splitEdges[i];
 
-            for (const label edgei : pEdges)
+            const edge& e = edges()[edgei];
+
+            forAll(e, j)
             {
-                const label otherPointi = edges()[edgei].otherVertex(pointi);
+                label pointi = e[j];
 
-                const labelList& pFaces = pointFaces()[otherPointi];
+                const labelList& pFaces = pointFaces()[pointi];
 
-                for (const label facei : pFaces)
+                forAll(pFaces, pFacei)
                 {
-                    faceToSplitPoint.insert(facei, otherPointi);
+                    faceToSplitPoint.insert(pFaces[pFacei], pointi);
                 }
             }
         }
@@ -1013,7 +1015,7 @@ Foam::labelList Foam::dynamicRefine2DFvMesh::selectUnrefineEdges
         )
     );
     Info<< "Selected " << returnReduce(consistentSet.size(), sumOp<label>())
-        << " split points out of a possible "
+        << " split edges out of a possible "
         << returnReduce(newSplitEdges.size(), sumOp<label>())
         << "." << endl;
 
@@ -1027,7 +1029,7 @@ void Foam::dynamicRefine2DFvMesh::extendMarkedCells
 ) const
 {
     // Mark faces using any marked cell
-    bitSet markedFace(nFaces());
+    bitSet markedFace(nFaces(), false);
 
     for (const label celli : markedCell)
     {
@@ -1093,20 +1095,29 @@ void Foam::dynamicRefine2DFvMesh::checkMaxAnchorPoints
         }
     }
 
-
     forAll(protectedCell, celli)
     {
-        if (!protectedCell.test(celli) && cellPoints(celli).size() == 8 && nAnchorPoints[celli] != 8)
+        // Dezhi Dai: avoid to put wedges in protected list during case re-start
+        if (!protectedCell.test(celli))
         {
-            protectedCell.set(celli);
-        }
+            if (cellPoints(celli).size() == 8)
+            {
+                if (nAnchorPoints[celli] != 8 and nAnchorPoints[celli] != 6)
+                {
+                    protectedCell.set(celli);
+                }
+            }
 
-        // Wedge
-        if (!protectedCell.test(celli) && cellPoints(celli).size() == 6 && nAnchorPoints[celli] != 6)
-        {
-            protectedCell.set(celli);
+            if (cellPoints(celli).size() == 6)
+            {
+                if (nAnchorPoints[celli] != 6)
+                {
+                    protectedCell.set(celli);
+                }
+            }
         }
     }
+
 }
 
 
@@ -1259,17 +1270,32 @@ bool Foam::dynamicRefine2DFvMesh::init(const bool doInit)
             }
             // Luca Cornolti: avoid to put wedges in protected list
             // Checking the face size is probably redundant
-            else if(cFaces.size() == 5)
+            else if (cFaces.size() == 5)
             {
             }
             else
             {
+                // Dezhi Dai: Calculate summaiton of neighbour cell levels
+                label neighbourLevelSum(0);
+                for (const label cfacei : cFaces)
+                {
+                    if (cfacei < nInternalFaces())  // Dezhi Dai: Internal faces only
+                    {
+                        neighbourLevelSum += cellLevel[faceNeighbour()[cfacei]+faceOwner()[cfacei]-celli];
+                    }
+                    
+                }
+
                 for (const label cfacei : cFaces)
                 {
                     if (faces()[cfacei].size() < 4)
                     {
-                        protectedCell_.set(celli);
-                        break;
+                        // Dezhi Dai: avoid to put wedges in protected list during case re-start
+                        if (neighbourLevelSum == 0)
+                        {
+                            protectedCell_.set(celli);
+                            break;
+                        }
                     }
                 }
             }
@@ -1474,10 +1500,9 @@ bool Foam::dynamicRefine2DFvMesh::updateTopology()
             }
         }
 
-
         {
             // Select unrefineable points that are not marked in refineCell
-            labelList pointsToUnrefine
+            labelList edgesToUnrefine
             (
                 selectUnrefineEdges
                 (
@@ -1487,10 +1512,10 @@ bool Foam::dynamicRefine2DFvMesh::updateTopology()
                 )
             );
 
-            if (returnReduceOr(pointsToUnrefine.size()))
+            if (returnReduceOr(edgesToUnrefine.size()))
             {
                 // Refine/update mesh
-                unrefine(pointsToUnrefine);
+                unrefine(edgesToUnrefine);
 
                 hasChanged = true;
             }
