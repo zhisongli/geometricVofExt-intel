@@ -27,6 +27,7 @@ wmake libso SimPLIC
 
 if have_cgal; then
     echo -n "    >> "
+    cp -f ../patches/iterator.h ${WM_THIRD_PARTY_DIR}/platforms/linux64Icx/CGAL-4.14.3/include/CGAL/boost/graph/
     wmake libso CGALVof
 else
     echo "    >> WARNING: CGAL is not found, cannot build CGALVof, skip"
